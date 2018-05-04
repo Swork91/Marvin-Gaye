@@ -4,6 +4,7 @@ Created on May 1, 2018
 @author: Sam
 '''
 from pip._vendor.distlib.compat import raw_input
+import sys
 print ('Welcome to Marvin Gaye\'s Quest To Go Bowling')
 
 class Creature:
@@ -12,6 +13,7 @@ class Creature:
     def __init__(self, name, albums, jazz, damage):
         self.name = name
         self.albums = albums # health
+        self.maxHealth = albums
         self.damage = damage
         self.jazz = jazz # magic damage
         
@@ -27,13 +29,18 @@ class Creature:
                
 class Marvin(Creature):
     'the man himself'
+    
     def attack(self, Creature):
         print('You attack {} for {}.'.format(Creature.name, self.damage))
         Creature.albums-=self.damage
         
     def heal(self):
-        print('You heal for {}.'.format(self.jazz))
         self.albums+=self.jazz
+        if (self.maxHealth<self.albums):
+            print('You heal for {}.'.format(self.maxHealth-(self.albums-self.jazz)))
+            self.albums = self.maxHealth
+        else:
+            print('You heal for {}.'.format(self.jazz))
         
 marvin = Marvin('Marvin', 17, 6, 5) # Create marvin right away since hes kinda important to everything? 
 
@@ -52,23 +59,28 @@ def combatOneOnOne(Creature1):
                     print ("'{}' bites it.".format(Creature1.name))
                 else:
                     Creature1.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
         if (playerChoice=='2'): # Heal self
             marvin.heal()
             if (Creature1.albums <= 0):
                 pass
             else:
                 Creature1.attack(marvin)
+                if (marvin.albums<0): #dead check
+                    return False
         if (playerChoice=='3'): # inspect self
             print(marvin)
         if (playerChoice=='4'): # inspect target
             print(Creature1)
         if (playerChoice=='9'): # Display options
             print(" 1 to attack '{}'\n 2 to Heal\n 3 to inspect '{}'\n 4 to inspect '{}'\n 9 to show this\n 0 to quit".format(Creature1.name, marvin.name, Creature1.name))
-        if ((Creature1.albums <=0)):
-            playerChoice = '0'
-            print("you won")
+        if ((Creature1.albums <=0)): # all foes defeated
+            #playerChoice = '0'
+            return True
         else:
             playerChoice = raw_input('\nEnter things: ')
+    return False # quit
         
 def combatOneOnTwo(Creature1, Creature2):
     playerChoice = raw_input('\n\nEnter things: ')
@@ -82,10 +94,14 @@ def combatOneOnTwo(Creature1, Creature2):
                     print ("'{}' bites it.".format(Creature1.name))
                 else:
                     Creature1.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
                 if (Creature2.albums <= 0):
                     pass
                 else:
                     Creature2.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
         if (playerChoice=='2'): # attack target 2
             if (Creature2.albums <= 0):
                 print("'{}' is already long gone".format(Creature2.name))
@@ -95,20 +111,28 @@ def combatOneOnTwo(Creature1, Creature2):
                     print ("'{}' bites it.".format(Creature2.name))
                 else:
                     Creature2.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
                 if (Creature1.albums <= 0):
                     pass
                 else:
                     Creature1.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
         if (playerChoice=='3'): # Heal self
             marvin.heal()
             if (Creature1.albums <= 0):
                 pass
             else:
                 Creature1.attack(marvin)
+                if (marvin.albums<0): #dead check
+                    return False
             if (Creature2.albums <= 0):
                 pass
             else:
                 Creature2.attack(marvin)
+                if (marvin.albums<0): #dead check
+                    return False
         if (playerChoice=='4'): # inspect self
             print(marvin)
         if (playerChoice=='5'): # inspect target 1
@@ -117,12 +141,11 @@ def combatOneOnTwo(Creature1, Creature2):
             print(Creature2)
         if (playerChoice=='9'): # Display options
             print(" 1 to attack '{}'\n 2 to attack '{}'\n 3 to Heal\n 4 to inspect '{}'\n 5 to inspect '{}'\n 6 to inspect '{}'\n 9 to show this\n 0 to quit".format(Creature1.name, Creature2.name, marvin.name, Creature1.name, Creature2.name))
-        if ((Creature1.albums <=0) & (Creature2.albums <=0)):
-            playerChoice = '0'
-            print("you won")
+        if ((Creature1.albums <=0) & (Creature2.albums <=0)):# all foes defeated
+            return True
         else:
             playerChoice = raw_input('\nEnter things: ')
-
+    return False
         
 def combatOneOnThree(Creature1, Creature2, Creature3):
     playerChoice = raw_input('\n\nEnter things: ')
@@ -136,14 +159,20 @@ def combatOneOnThree(Creature1, Creature2, Creature3):
                     print ("'{}' bites it.".format(Creature1.name))
                 else:
                     Creature1.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
                 if (Creature2.albums <= 0):
                     pass
                 else:
                     Creature2.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
                 if (Creature3.albums <= 0):
                     pass
                 else:
                     Creature3.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
         if (playerChoice=='2'): # attack target 2
             if (Creature2.albums <= 0):
                 print("'{}' is already long gone".format(Creature2.name))
@@ -153,14 +182,20 @@ def combatOneOnThree(Creature1, Creature2, Creature3):
                     print ("'{}' bites it.".format(Creature2.name))
                 else:
                     Creature2.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
                 if (Creature1.albums <= 0):
                     pass
                 else:
                     Creature1.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
                 if (Creature3.albums <= 0):
                     pass
                 else:
                     Creature3.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
         if (playerChoice=='3'): # attack target 3
             if (Creature3.albums <= 0):
                 print("'{}' is already long gone".format(Creature3.name))
@@ -170,28 +205,40 @@ def combatOneOnThree(Creature1, Creature2, Creature3):
                     print ("'{}' bites it.".format(Creature3.name))
                 else:
                     Creature3.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
                 if (Creature1.albums <= 0):
                     pass
                 else:
                     Creature1.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
                 if (Creature2.albums <= 0):
                     pass
                 else:
                     Creature2.attack(marvin)
+                    if (marvin.albums<0): #dead check
+                        return False
         if (playerChoice=='4'): # Heal self
             marvin.heal()
             if (Creature1.albums <= 0):
                 pass
             else:
                 Creature1.attack(marvin)
+                if (marvin.albums<0): #dead check
+                        return False
             if (Creature2.albums <= 0):
                 pass
             else:
                 Creature2.attack(marvin)
+                if (marvin.albums<0): #dead check
+                        return False
             if (Creature3.albums <= 0):
                 pass
             else:
                 Creature3.attack(marvin)
+                if (marvin.albums<0): #dead check
+                        return False
         if (playerChoice=='5'): # inspect self
             print(marvin)
         if (playerChoice=='6'): # inspect target 1
@@ -203,20 +250,37 @@ def combatOneOnThree(Creature1, Creature2, Creature3):
         if (playerChoice=='9'): # Display options
             print(" 1 to attack '{}'\n 2 to attack '{}'\n 3 to attack '{}'\n 4 to Heal\n 5 to inspect '{}'\n 6 to inspect '{}'\n 7 to inspect '{}'\n 8 to inspect '{}'\n 0 to quit".format(Creature1.name, Creature2.name, Creature3.name, marvin.name, Creature1.name, Creature2.name, Creature3.name))
         if ((Creature1.albums <=0) & (Creature2.albums <=0) & (Creature3.albums <=0)):
-            playerChoice = '0'
-            print("you won")
+            return True
         else:
             playerChoice = raw_input('\nEnter things: ')
+    return False
 
-
+def gameOver():
+    print('Game over. Thanks for playing.')
+    sys.exit()
+    
+def combatVictory():
+    print('You have defeated all foes, you are the jazz master.')
+'''
+public static void main(String[] args){
+'''
 tim = Creature('Tim', 10, 3, 3)
-combatOneOnOne(tim)
+if (combatOneOnOne(tim)):
+    combatVictory() #since you win just keep on truckin
+else:
+    gameOver()# you lost, well. The game should end somehow.
 
 jeff = Creature('Jeff', 10, 2, 2)
 alan = Creature('Alan', 10, 3, 1)
-combatOneOnTwo(jeff, alan)
-
+if (combatOneOnTwo(jeff, alan)):
+    combatVictory() #since you win just keep on truckin
+else:
+    gameOver()# you lost, well. The game should end somehow.
+    
 bob = Creature('Robert', 10, 2, 2)
 clide = Creature('Clide', 10, 3, 2)
 doug = Creature('Doug', 10, 3, 3)
-combatOneOnThree(bob, clide, doug)
+if (combatOneOnThree(bob, clide, doug)):
+    combatVictory() #since you win just keep on truckin
+else:
+    gameOver()# you lost, well. The game should end somehow.
