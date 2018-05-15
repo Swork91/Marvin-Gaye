@@ -43,37 +43,63 @@ class Marvin(Creature):
             print('You heal for {}.'.format(self.jazz))
             
 def selectAction():
-    playerChoice = raw_input('\n\nCombat Start! Select action (1 attack, 2 magic, 3 item): ')
+    playerChoice = raw_input(': ')
     while (playerChoice != '0'): 
-        if (playerChoice=='1'): # attack
-            print("attack chosen")
+        if (playerChoice=='1'):
             return 1
-        elif (playerChoice=='2'): # magic
-            print("magic chosen")
+        elif (playerChoice=='2'):
             return 2
-        elif (playerChoice=='3'): # item
-            print("item chosen")
+        elif (playerChoice=='3'):
             return 3
+        elif (playerChoice=='4'):
+            return 4
+        elif (playerChoice=='5'):
+            return 5
         else:
-            print('error')   
-        playerChoice = raw_input('\nSelect action: ')
+            print('Controls: enter a valid number 1-5')   
+        playerChoice = raw_input(': ')
                
+
 class CombatStart:
     @classmethod
     def oneOnOne(cls, marv, creature1):
-        print("test 1v1")
+        print("Combat Start! Select action:")
+        validChoice = False
         option = selectAction()
         # Action chosen. Now choose target. 
-        if(option==1):
-            print("attack {}".format(creature1.name))
-        elif(option==2):
-            print("magic {}".format(creature1.name))
-        elif(option==3):
-            print("item {}".format(creature1.name))
+        while(validChoice == False):
+            if(option==1):
+                validChoice = True
+                print("attack {}".format(creature1.name))
+            elif(option==2):
+                validChoice = True
+                print("magic {}".format(creature1.name))
+            elif(option==3):
+                validChoice = True
+                print("item {}".format(creature1.name))
+            else:
+                print("1 for attack, 2 for magic, 3 for items:")
+                option = selectAction()
       
     @classmethod  
     def oneOnTwo(cls, marv, creature1, Creature2):
-        print('test 1v2')
+        print("Combat Start! Select action:")
+        validChoice = False
+        option = selectAction()
+        # Action chosen. Now choose target. 
+        while(validChoice == False):
+            if(option==1):
+                validChoice = True
+                print("attack {}".format(creature1.name))
+            elif(option==2):
+                validChoice = True
+                print("magic {}".format(creature1.name))
+            elif(option==3):
+                validChoice = True
+                print("item {}".format(creature1.name))
+            else:
+                print("1 for attack, 2 for magic, 3 for items:")
+                option = selectAction()
     
 
             
