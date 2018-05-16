@@ -15,7 +15,7 @@ class Creature:
         self.albums = albums # health
         self.maxHealth = albums
         self.damage = damage
-        self.jazz = jazz # magic damage
+        self.jazz = jazz # magic
         
     def __repr__(self):
         return "Creature('{}', {}, {}, {})".format(self.name, self.albums, self.jazz, self.damage)
@@ -23,16 +23,22 @@ class Creature:
     def __str__(self):
         return " Name: {}\n Albums: {}\n Damage: {}".format(self.name, self.albums, self.damage)
 
-    def attack(self, Creature):
-        print('{} attacks you for {}.'.format(self.name, self.damage))
-        Creature.albums-=self.damage
+    def attack(self, creature):
+        if(self.albums<=0):
+            pass
+        else:
+            print('{} attacks {} for {}.'.format(self.name, creature.name, self.damage))
+            creature.albums-=self.damage
                
 class Marvin(Creature):
     'the man himself'
     
-    def attack(self, Creature):
-        print('You attack {} for {}.'.format(Creature.name, self.damage))
-        Creature.albums-=self.damage
+    def attack(self, creature):
+        if(self.albums<=0):
+            pass
+        else:
+            print('{} attacks {} for {}.'.format(self.name, creature.name, self.damage))
+            creature.albums-=self.damage
         
     def heal(self):
         self.albums+=self.jazz
@@ -161,9 +167,8 @@ class CombatStart:
     #handles one on one combat encounters. 
     @classmethod
     def oneOnOne(cls, marv, creature1):
-        CreatureOneDead = False
         print("\n !!!!!!! Combat Start !!!!!!!")
-        while(CreatureOneDead==False):
+        while(creature1.albums>0):
             menuSelection = combatMenu()
             
             if(menuSelection==1): #attack
@@ -171,11 +176,7 @@ class CombatStart:
                 targetSelection = oneTarget()
                 if(targetSelection==1): #attack creature1
                     marv.attack(creature1)
-                    if(creature1.albums<=0):
-                        CreatureOneDead=True
-                        print("{} faints.".format(creature1.name))
-                    else:
-                        creature1.attack(marv)
+                    creature1.attack(marv)
                 elif(targetSelection==5): #return to combat menu
                     pass
                 
@@ -184,11 +185,7 @@ class CombatStart:
                 targetSelection = oneTarget()
                 if(targetSelection==1): #heal marv
                     marv.heal()
-                    if(creature1.albums<=0):
-                        CreatureOneDead=True
-                        print("{} faints.".format(creature1.name))
-                    else:
-                        creature1.attack(marv)
+                    creature1.attack(marv)
                 elif(targetSelection==5): #return to combat menu
                     pass
                 
@@ -199,80 +196,43 @@ class CombatStart:
                 targetSelection = twoTarget()
                 if(targetSelection==1): #item marv
                     print("used item on {}!".format(marv.name)) # TODO: replace me with itemMenu() stuff
-                    if(creature1.albums<=0):
-                        CreatureOneDead=True
-                        print("{} faints.".format(creature1.name))
-                    else:
-                        creature1.attack(marv)
+                    creature1.attack(marv)
                 elif(targetSelection==2): #item creature1
                     print("used item on {}!".format(creature1.name)) # TODO: replace me with itemMenu() stuff
-                    if(creature1.albums<=0):
-                        CreatureOneDead=True
-                        print("{} faints.".format(creature1.name))
-                    else:
-                        creature1.attack(marv)
+                    creature1.attack(marv)
                 elif(targetSelection==5): #return to combat menu
                     pass
                 
     #handles two on one combat encounters.          
     @classmethod  
     def oneOnTwo(cls, marv, creature1, creature2):
-        CreatureOneDead = False
-        CreatureTwoDead = False
         print("\n !!!!!!! Combat Start !!!!!!!")
-        while((CreatureOneDead==False) | (CreatureTwoDead==False)):
+        while((creature1.albums>0) | (creature2.albums>0)):
             menuSelection = combatMenu()
+            
             if(menuSelection==1): #attack
                 print("Select target to attack:\n'1' for {}, 2 for {}".format(creature1.name, creature2.name))
                 targetSelection = twoTarget()
-                if(targetSelection==1): #attack creature1
+                if((targetSelection==1) & (creature1.albums>=0)): #attack creature1
                     marv.attack(creature1)
-                    if(CreatureOneDead==False):
-                        if(creature1.albums<=0):
-                            CreatureOneDead=True
-                            print("{} faints.".format(creature1.name))
-                        else:
-                            creature1.attack(marv)
-                    if(CreatureTwoDead==False):
-                        if(creature2.albums<=0):
-                            CreatureTwoDead=True
-                            print("{} faints.".format(creature2.name))
-                        else:
-                            creature2.attack(marv)
-                if(targetSelection==2): #attack creature2
+                    creature1.attack(marv)
+                    creature2.attack(marv)
+                elif((targetSelection==2) & (creature2.albums>=0)): #attack creature2
                     marv.attack(creature2)
-                    if(CreatureOneDead==False):
-                        if(creature1.albums<=0):
-                            CreatureOneDead=True
-                            print("{} faints.".format(creature1.name))
-                        else:
-                            creature1.attack(marv)
-                    if(CreatureTwoDead==False):
-                        if(creature2.albums<=0):
-                            CreatureTwoDead=True
-                            print("{} faints.".format(creature2.name))
-                        else:
-                            creature2.attack(marv)
+                    creature1.attack(marv)
+                    creature2.attack(marv)
                 elif(targetSelection==5): #return to combat menu
                     pass
+                else:
+                    print("target already down")
                 
             elif(menuSelection==2): #magic
                 print("Select target to heal:\n'1' for {}".format(marv.name))
                 targetSelection = oneTarget()
                 if(targetSelection==1): #heal marv
                     marv.heal()                    
-                    if(CreatureOneDead==False):
-                        if(creature1.albums<=0):
-                            CreatureOneDead=True
-                            print("{} faints.".format(creature1.name))
-                        else:
-                            creature1.attack(marv)
-                    if(CreatureTwoDead==False):
-                        if(creature2.albums<=0):
-                            CreatureTwoDead=True
-                            print("{} faints.".format(creature2.name))
-                        else:
-                            creature2.attack(marv)
+                    creature1.attack(marv)
+                    creature2.attack(marv)
                 elif(targetSelection==5): #return to combat menu
                     pass
                 
@@ -283,60 +243,102 @@ class CombatStart:
                 targetSelection = threeTarget()
                 if(targetSelection==1): #item marv
                     print("used item on {}!".format(marv.name)) # TODO: replace me with itemMenu() stuff
-                    if(CreatureOneDead==False):
-                        if(creature1.albums<=0):
-                            CreatureOneDead=True
-                            print("{} faints.".format(creature1.name))
-                        else:
-                            creature1.attack(marv)
-                    if(CreatureTwoDead==False):
-                        if(creature2.albums<=0):
-                            CreatureTwoDead=True
-                            print("{} faints.".format(creature2.name))
-                        else:
-                            creature2.attack(marv)
-                elif(targetSelection==2): #item creature1
+                    creature1.attack(marv)
+                    creature2.attack(marv)
+                elif((targetSelection==2) & (creature1.albums>=0)): #item creature1
                     print("used item on {}!".format(creature1.name)) # TODO: replace me with itemMenu() stuff
-                    if(CreatureOneDead==False):
-                        if(creature1.albums<=0):
-                            CreatureOneDead=True
-                            print("{} faints.".format(creature1.name))
-                        else:
-                            creature1.attack(marv)
-                    if(CreatureTwoDead==False):
-                        if(creature2.albums<=0):
-                            CreatureTwoDead=True
-                            print("{} faints.".format(creature2.name))
-                        else:
-                            creature2.attack(marv)
-                elif(targetSelection==3): #item creature2
+                    creature1.attack(marv)
+                    creature2.attack(marv)
+                elif((targetSelection==3) & (creature2.albums>=0)): #item creature2
                     print("used item on {}!".format(creature2.name)) # TODO: replace me with itemMenu() stuff
-                    if(CreatureOneDead==False):
-                        if(creature1.albums<=0):
-                            CreatureOneDead=True
-                            print("{} faints.".format(creature1.name))
-                        else:
-                            creature1.attack(marv)
-                    if(CreatureTwoDead==False):
-                        if(creature2.albums<=0):
-                            CreatureTwoDead=True
-                            print("{} faints.".format(creature2.name))
-                        else:
-                            creature2.attack(marv)
+                    creature1.attack(marv)
+                    creature2.attack(marv)
                 elif(targetSelection==5): #return to combat menu
                     pass
+                else:
+                    print("target already down")
                 
     #handles three on one combat encounters.          
     @classmethod  
     def oneOnThree(cls, marv, creature1, creature2, creature3):
-        pass
-        #TODO: The whole method.
-    
+        print("\n !!!!!!! Combat Start !!!!!!!")
+        while((creature1.albums>0) | (creature2.albums>0) | (creature3.albums>0)):
+            menuSelection = combatMenu()
+            
+            if(menuSelection==1): #attack
+                print("Select target to attack:\n'1' for {}, 2 for {}, 3 for {}".format(creature1.name, creature2.name, creature3.name))
+                targetSelection = twoTarget()
+                if((targetSelection==1) & (creature1.albums>=0)): #attack creature1
+                    marv.attack(creature1)
+                    creature1.attack(marv)
+                    creature2.attack(marv)
+                    creature3.attack(marv)
+                elif((targetSelection==2) & (creature2.albums>=0)): #attack creature2
+                    marv.attack(creature2)
+                    creature1.attack(marv)
+                    creature2.attack(marv)
+                    creature3.attack(marv)
+                elif((targetSelection==3) & (creature3.albums>=0)): #attack creature2
+                    marv.attack(creature3)
+                    creature1.attack(marv)
+                    creature2.attack(marv)
+                    creature3.attack(marv)
+                elif(targetSelection==5): #return to combat menu
+                    pass
+                else:
+                    print("target already down")
+                
+            elif(menuSelection==2): #magic
+                print("Select target to heal:\n'1' for {}".format(marv.name))
+                targetSelection = oneTarget()
+                if(targetSelection==1): #heal marv
+                    marv.heal()                    
+                    creature1.attack(marv)
+                    creature2.attack(marv)
+                    creature3.attack(marv)
+                elif(targetSelection==5): #return to combat menu
+                    pass
+                
+            elif(menuSelection==3): #item
+                #TODO: Make an item class I guess. 
+                itemSelection = itemMenu()
+                print("Select target to use item on:\n'1' for {}, '2' for {}, 3 for {}".format(marv.name, creature1.name, creature2.name))
+                targetSelection = threeTarget()
+                if(targetSelection==1): #item marv
+                    print("used item on {}!".format(marv.name)) # TODO: replace me with itemMenu() stuff
+                    creature1.attack(marv)
+                    creature2.attack(marv)
+                    creature3.attack(marv)
+                elif((targetSelection==2) & (creature1.albums>=0)): #item creature1
+                    print("used item on {}!".format(creature1.name)) # TODO: replace me with itemMenu() stuff
+                    creature1.attack(marv)
+                    creature2.attack(marv)
+                    creature3.attack(marv)
+                elif((targetSelection==3) & (creature2.albums>=0)): #item creature2
+                    print("used item on {}!".format(creature2.name)) # TODO: replace me with itemMenu() stuff
+                    creature1.attack(marv)
+                    creature2.attack(marv)
+                    creature3.attack(marv)
+                elif((targetSelection==4) & (creature3.albums>=0)): #item creature2
+                    print("used item on {}!".format(creature3.name)) # TODO: replace me with itemMenu() stuff
+                    creature1.attack(marv)
+                    creature2.attack(marv)
+                    creature3.attack(marv)
+                elif(targetSelection==5): #return to combat menu
+                    pass
+                else:
+                    print("target already down")
+                    
+marvin = Marvin('Marvin', 25, 5, 6)    
+
 tim = Creature('Tim', 10, 3, 3)
+
 jeff = Creature('Jeff', 10, 3, 3)
 mark = Creature('Mark', 10, 3, 3)
 
-marvin = Marvin('Marvin', 25, 5, 6)
+mooka = Creature('Guard A', 5, 3, 3)
+mookb = Creature('Guard B', 5, 3, 3)
+boss = Creature('Big Boss', 20, 3, 3)
 
 introBattle = CombatStart.oneOnOne(marvin, mark)
 # TODO: Add a victory thing here when combat exits. 
@@ -344,5 +346,5 @@ introBattle = CombatStart.oneOnOne(marvin, mark)
 rematch  = CombatStart.oneOnTwo(marvin, tim, jeff)
 # TODO: Add a victory thing here when combat exits. 
 
-# marvin.attack(tim)
-# tim.attack(marvin)
+finalBoss  = CombatStart.oneOnTwo(mooka, mookb, boss)
+# TODO: Add a victory thing here when combat exits. 
