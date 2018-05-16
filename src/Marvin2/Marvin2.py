@@ -18,7 +18,7 @@ class Creature:
         self.jazz = jazz # magic
         
     def __repr__(self):
-        return "Creature('{}', {}, {}, {})".format(self.name, self.albums, self.jazz, self.damage)
+        return " Name: {}\n Albums: {}\n Damage: {}".format(self.name, self.albums, self.damage)
 
     def __str__(self):
         return " Name: {}\n Albums: {}\n Damage: {}".format(self.name, self.albums, self.damage)
@@ -29,7 +29,7 @@ class Creature:
         else:
             print('{} attacks {} for {}.'.format(self.name, creature.name, self.damage))
             creature.albums-=self.damage
-               
+        
 class Marvin(Creature):
     'the man himself'
     
@@ -47,7 +47,42 @@ class Marvin(Creature):
             self.albums = self.maxHealth
         else:
             print('You heal for {}.'.format(self.jazz))
-
+            
+class Item:
+    'Base class for all items'
+    
+    def __init__(self, name, value, health, flavor):
+        self.name = name
+        self.value = value
+        self.health = health #Healing or damage amount
+        self.description = flavor # flavor text
+        
+    def __repr__(self):    
+        return '{}'.format(self.name)
+        
+    def __str__(self):
+        if(self.description==0):
+            return " '{}'\n Value: {}\n".format(self.name, self.value)
+        else:
+            return " '{}'\n Value: {}\n '{}'".format(self.name, self.value, self.description)
+    
+    def use(self):
+        pass
+            
+class Potion(Item):
+    'Healing and other restorative potions.'
+    
+    def use(self, targetCreature):
+        print("{} heals {} for {}.".format(self.name, targetCreature, self.health))
+        targetCreature.albums+=self.health
+        
+class Poison(Item):
+    'Deals damage to target.'
+    
+    def use(self, targetCreature):
+        print("{} poisons {} for {}.".format(self.name, targetCreature, self.damage))
+        targetCreature.albums-=self.health
+        
 # Read user input for the whole game.
 # TODO: Possible efficiency issues. Try removing. 
 def selectAction():
@@ -85,6 +120,8 @@ def combatMenu():
         else:
             print("Enter 1 for attack, 2 for magic, 3 for items:")
             option = selectAction()
+            
+# TODO: Everything.
 def itemMenu():
     pass
 
@@ -190,15 +227,14 @@ class CombatStart:
                     pass
                 
             elif(menuSelection==3): #item
-                #TODO: Make an item class I guess. 
                 itemSelection = itemMenu()
                 print("Select target to use item on:\n'1' for {}, '2' for {}".format(marv.name, creature1.name))
                 targetSelection = twoTarget()
                 if(targetSelection==1): #item marv
-                    print("used item on {}!".format(marv.name)) # TODO: replace me with itemMenu() stuff
+                    minorHealthPotion.use(marv)
                     creature1.attack(marv)
                 elif(targetSelection==2): #item creature1
-                    print("used item on {}!".format(creature1.name)) # TODO: replace me with itemMenu() stuff
+                    minorHealthPotion.use(creature1)
                     creature1.attack(marv)
                 elif(targetSelection==5): #return to combat menu
                     pass
@@ -237,7 +273,6 @@ class CombatStart:
                     pass
                 
             elif(menuSelection==3): #item
-                #TODO: Make an item class I guess. 
                 itemSelection = itemMenu()
                 print("Select target to use item on:\n'1' for {}, '2' for {}, 3 for {}".format(marv.name, creature1.name, creature2.name))
                 targetSelection = threeTarget()
@@ -300,7 +335,6 @@ class CombatStart:
                     pass
                 
             elif(menuSelection==3): #item
-                #TODO: Make an item class I guess. 
                 itemSelection = itemMenu()
                 print("Select target to use item on:\n'1' for {}, '2' for {}, 3 for {}".format(marv.name, creature1.name, creature2.name))
                 targetSelection = threeTarget()
@@ -328,17 +362,28 @@ class CombatStart:
                     pass
                 else:
                     print("target already down")
-                    
-marvin = Marvin('Marvin', 25, 5, 6)    
+
+'''
+dumb testing stuff goes here
+'''
+marvin = Marvin('Marvin', 25, 5, 6)
+minorHealthPotion = Potion("M. Health Pot.", 1, 10, 0)
+majorHealthPotion = Potion("Ma. Health Pot.", 1, 10, 'heals more')
+minorPoison = Poison("Minor Poison", 1, 10, 0)
+            
+# TODO: Should keep track of the players inventory by adding objects(items) and removing them.
+inventory = []
+inventory.append(minorHealthPotion)
+print(inventory)
 
 tim = Creature('Tim', 10, 3, 3)
 
-jeff = Creature('Jeff', 10, 3, 3)
-mark = Creature('Mark', 10, 3, 3)
+jeff = Creature('Jeff', 10, 2, 3)
+mark = Creature('Mark', 10, 2, 3)
 
-mooka = Creature('Guard A', 5, 3, 3)
-mookb = Creature('Guard B', 5, 3, 3)
-boss = Creature('Big Boss', 20, 3, 3)
+mooka = Creature('Guard A', 5, 1, 3)
+mookb = Creature('Guard B', 5, 1, 3)
+boss = Creature('Big Boss', 20, 10, 6)
 
 introBattle = CombatStart.oneOnOne(marvin, mark)
 # TODO: Add a victory thing here when combat exits. 
