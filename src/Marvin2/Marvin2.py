@@ -73,9 +73,13 @@ class Potion(Item):
     'Healing and other restorative potions.'
     
     def use(self, targetCreature):
-        print("{} heals {} for {}.".format(self.name, targetCreature.name, self.health))
         targetCreature.albums+=self.health
-        
+        if (targetCreature.maxHealth<targetCreature.albums):
+            print("{} heals {} for {}.".format(self.name, targetCreature.name,targetCreature.maxHealth-(targetCreature.albums-self.health)))
+            targetCreature.albums = targetCreature.maxHealth
+        else:
+            print("{} heals {} for {}.".format(self.name, targetCreature.name, self.health))
+
 class Poison(Item):
     'Deals damage to target.'
     
@@ -126,7 +130,11 @@ inventory = []
 
 # Selects the item from inventory
 def itemMenu():
-    print(inventory)
+    if(len(inventory)==0):
+        print("[empty]")
+        return 0
+    else:
+        print(inventory)
     item = selectAction()
     return inventory[item-1]
 
@@ -238,16 +246,21 @@ class CombatStart:
                 
             elif(menuSelection==3): #item
                 itemSelection = itemMenu()
-                print("Select target to use [{}] on:\n'1' for {}, '2' for {}".format(itemSelection.name, marv.name, creature1.name))
-                targetSelection = twoTarget()
-                if(targetSelection==1): #item marv
-                    itemAction(itemSelection, marv)
-                    creature1.attack(marv)
-                elif(targetSelection==2): #item creature1
-                    itemAction(itemSelection, creature1)
-                    creature1.attack(marv)
-                elif(targetSelection==5): #return to combat menu
+                if(itemSelection==0):
+                    print("No items.")
                     pass
+                else:
+                    print("Select target to use [{}] on:\n'1' for {}, '2' for {}".format(itemSelection.name, marv.name, creature1.name))
+                    targetSelection = twoTarget()
+                    if(targetSelection==1): #item marv
+                        itemAction(itemSelection, marv)
+                        creature1.attack(marv)
+                    elif(targetSelection==2): #item creature1
+                        itemAction(itemSelection, creature1)
+                        creature1.attack(marv)
+                    elif(targetSelection==5): #return to combat menu
+                        pass
+                    
                 
     #handles two on one combat encounters.          
     @classmethod  
@@ -284,24 +297,28 @@ class CombatStart:
                 
             elif(menuSelection==3): #item
                 itemSelection = itemMenu()
-                print("Select target to use item on:\n'1' for {}, '2' for {}, 3 for {}".format(marv.name, creature1.name, creature2.name))
-                targetSelection = threeTarget()
-                if(targetSelection==1): #item marv
-                    itemAction(itemSelection, marv)
-                    creature1.attack(marv)
-                    creature2.attack(marv)
-                elif((targetSelection==2) & (creature1.albums>=0)): #item creature1
-                    itemAction(itemSelection, creature1)
-                    creature1.attack(marv)
-                    creature2.attack(marv)
-                elif((targetSelection==3) & (creature2.albums>=0)): #item creature2
-                    itemAction(itemSelection, creature2)
-                    creature1.attack(marv)
-                    creature2.attack(marv)
-                elif(targetSelection==5): #return to combat menu
+                if(itemSelection==0):
+                    print("No items.")
                     pass
                 else:
-                    print("target already down")
+                    print("Select target to use item on:\n'1' for {}, '2' for {}, 3 for {}".format(marv.name, creature1.name, creature2.name))
+                    targetSelection = threeTarget()
+                    if(targetSelection==1): #item marv
+                        itemAction(itemSelection, marv)
+                        creature1.attack(marv)
+                        creature2.attack(marv)
+                    elif((targetSelection==2) & (creature1.albums>=0)): #item creature1
+                        itemAction(itemSelection, creature1)
+                        creature1.attack(marv)
+                        creature2.attack(marv)
+                    elif((targetSelection==3) & (creature2.albums>=0)): #item creature2
+                        itemAction(itemSelection, creature2)
+                        creature1.attack(marv)
+                        creature2.attack(marv)
+                    elif(targetSelection==5): #return to combat menu
+                        pass
+                    else:
+                        print("target already down")
                 
     #handles three on one combat encounters.          
     @classmethod  
@@ -346,45 +363,49 @@ class CombatStart:
                 
             elif(menuSelection==3): #item
                 itemSelection = itemMenu()
-                print("Select target to use item on:\n'1' for {}, '2' for {}, 3 for {}".format(marv.name, creature1.name, creature2.name))
-                targetSelection = threeTarget()
-                if(targetSelection==1): #item marv
-                    itemAction(itemSelection, marv)
-                    creature1.attack(marv)
-                    creature2.attack(marv)
-                    creature3.attack(marv)
-                elif((targetSelection==2) & (creature1.albums>=0)): #item creature1
-                    itemAction(itemSelection, creature1)
-                    creature1.attack(marv)
-                    creature2.attack(marv)
-                    creature3.attack(marv)
-                elif((targetSelection==3) & (creature2.albums>=0)): #item creature2
-                    itemAction(itemSelection, creature2)
-                    creature1.attack(marv)
-                    creature2.attack(marv)
-                    creature3.attack(marv)
-                elif((targetSelection==4) & (creature3.albums>=0)): #item creature3
-                    itemAction(itemSelection, creature3)
-                    creature1.attack(marv)
-                    creature2.attack(marv)
-                    creature3.attack(marv)
-                elif(targetSelection==5): #return to combat menu
+                if(itemSelection==0):
+                    print("No items.")
                     pass
                 else:
-                    print("target already down")
+                    print("Select target to use item on:\n'1' for {}, '2' for {}, 3 for {}".format(marv.name, creature1.name, creature2.name))
+                    targetSelection = threeTarget()
+                    if(targetSelection==1): #item marv
+                        itemAction(itemSelection, marv)
+                        creature1.attack(marv)
+                        creature2.attack(marv)
+                        creature3.attack(marv)
+                    elif((targetSelection==2) & (creature1.albums>=0)): #item creature1
+                        itemAction(itemSelection, creature1)
+                        creature1.attack(marv)
+                        creature2.attack(marv)
+                        creature3.attack(marv)
+                    elif((targetSelection==3) & (creature2.albums>=0)): #item creature2
+                        itemAction(itemSelection, creature2)
+                        creature1.attack(marv)
+                        creature2.attack(marv)
+                        creature3.attack(marv)
+                    elif((targetSelection==4) & (creature3.albums>=0)): #item creature3
+                        itemAction(itemSelection, creature3)
+                        creature1.attack(marv)
+                        creature2.attack(marv)
+                        creature3.attack(marv)
+                    elif(targetSelection==5): #return to combat menu
+                        pass
+                    else:
+                        print("target already down")
 
 '''
 dumb testing stuff goes here
-'''
-minorHealthPotion = Potion("Minor Health Potion", 1, 10, 0)
-medHealthPotion = Potion("Medium Health Potion", 1, 20, 'heals more')
-majorHealthPotion = Potion("Major Health Potion", 1, 999, 'heals full')
-minorPoison = Poison("Minor Poison", 1, 10, 0)
 
 inventory.append(minorHealthPotion)
 inventory.append(medHealthPotion)
 inventory.append(majorHealthPotion)
 inventory.append(minorPoison)
+'''
+minorHealthPotion = Potion("Minor Health Potion", 1, 10, 0)
+medHealthPotion = Potion("Medium Health Potion", 1, 20, 'heals more')
+majorHealthPotion = Potion("Major Health Potion", 1, 999, 'heals full')
+minorPoison = Poison("Minor Poison", 1, 10, 0)
 
 marvin = Marvin('Marvin', 25, 5, 6)
 
@@ -398,6 +419,9 @@ mookb = Creature('Guard B', 5, 1, 3)
 boss = Creature('Big Boss', 20, 10, 6)
 
 introBattle = CombatStart.oneOnOne(marvin, mark)
+print("you won! and found 2 minor healing potions.")
+inventory.append(minorHealthPotion)
+inventory.append(minorHealthPotion)
 # TODO: Add a victory thing here when combat exits. 
 
 rematch  = CombatStart.oneOnTwo(marvin, tim, jeff)
