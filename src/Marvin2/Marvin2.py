@@ -73,21 +73,21 @@ class Potion(Item):
     'Healing and other restorative potions.'
     
     def use(self, targetCreature):
-        print("{} heals {} for {}.".format(self.name, targetCreature, self.health))
+        print("{} heals {} for {}.".format(self.name, targetCreature.name, self.health))
         targetCreature.albums+=self.health
         
 class Poison(Item):
     'Deals damage to target.'
     
     def use(self, targetCreature):
-        print("{} poisons {} for {}.".format(self.name, targetCreature, self.damage))
+        print("{} poisons {} for {}.".format(self.name, targetCreature.name, self.health))
         targetCreature.albums-=self.health
         
 # Read user input for the whole game.
 # TODO: Possible efficiency issues. Try removing. 
 def selectAction():
     playerChoice = raw_input(': ')
-    while (playerChoice != '0'): 
+    while True: 
         if (playerChoice=='1'):
             return 1
         elif (playerChoice=='2'):
@@ -121,9 +121,19 @@ def combatMenu():
             print("Enter 1 for attack, 2 for magic, 3 for items:")
             option = selectAction()
             
-# TODO: Everything.
+# Player's inventory
+inventory = []
+
+# Selects the item from inventory
 def itemMenu():
-    pass
+    print(inventory)
+    item = selectAction()
+    return inventory[item-1]
+
+# uses item on creature
+def itemAction(itemSelection, targetCreature):
+    itemSelection.use(targetCreature)
+    inventory.remove(itemSelection)
 
 # checks if user input is valid for targeting one creature. 
 def oneTarget():
@@ -228,13 +238,13 @@ class CombatStart:
                 
             elif(menuSelection==3): #item
                 itemSelection = itemMenu()
-                print("Select target to use item on:\n'1' for {}, '2' for {}".format(marv.name, creature1.name))
+                print("Select target to use [{}] on:\n'1' for {}, '2' for {}".format(itemSelection.name, marv.name, creature1.name))
                 targetSelection = twoTarget()
                 if(targetSelection==1): #item marv
-                    minorHealthPotion.use(marv)
+                    itemAction(itemSelection, marv)
                     creature1.attack(marv)
                 elif(targetSelection==2): #item creature1
-                    minorHealthPotion.use(creature1)
+                    itemAction(itemSelection, creature1)
                     creature1.attack(marv)
                 elif(targetSelection==5): #return to combat menu
                     pass
@@ -277,15 +287,15 @@ class CombatStart:
                 print("Select target to use item on:\n'1' for {}, '2' for {}, 3 for {}".format(marv.name, creature1.name, creature2.name))
                 targetSelection = threeTarget()
                 if(targetSelection==1): #item marv
-                    print("used item on {}!".format(marv.name)) # TODO: replace me with itemMenu() stuff
+                    itemAction(itemSelection, marv)
                     creature1.attack(marv)
                     creature2.attack(marv)
                 elif((targetSelection==2) & (creature1.albums>=0)): #item creature1
-                    print("used item on {}!".format(creature1.name)) # TODO: replace me with itemMenu() stuff
+                    itemAction(itemSelection, creature1)
                     creature1.attack(marv)
                     creature2.attack(marv)
                 elif((targetSelection==3) & (creature2.albums>=0)): #item creature2
-                    print("used item on {}!".format(creature2.name)) # TODO: replace me with itemMenu() stuff
+                    itemAction(itemSelection, creature2)
                     creature1.attack(marv)
                     creature2.attack(marv)
                 elif(targetSelection==5): #return to combat menu
@@ -339,22 +349,22 @@ class CombatStart:
                 print("Select target to use item on:\n'1' for {}, '2' for {}, 3 for {}".format(marv.name, creature1.name, creature2.name))
                 targetSelection = threeTarget()
                 if(targetSelection==1): #item marv
-                    print("used item on {}!".format(marv.name)) # TODO: replace me with itemMenu() stuff
+                    itemAction(itemSelection, marv)
                     creature1.attack(marv)
                     creature2.attack(marv)
                     creature3.attack(marv)
                 elif((targetSelection==2) & (creature1.albums>=0)): #item creature1
-                    print("used item on {}!".format(creature1.name)) # TODO: replace me with itemMenu() stuff
+                    itemAction(itemSelection, creature1)
                     creature1.attack(marv)
                     creature2.attack(marv)
                     creature3.attack(marv)
                 elif((targetSelection==3) & (creature2.albums>=0)): #item creature2
-                    print("used item on {}!".format(creature2.name)) # TODO: replace me with itemMenu() stuff
+                    itemAction(itemSelection, creature2)
                     creature1.attack(marv)
                     creature2.attack(marv)
                     creature3.attack(marv)
-                elif((targetSelection==4) & (creature3.albums>=0)): #item creature2
-                    print("used item on {}!".format(creature3.name)) # TODO: replace me with itemMenu() stuff
+                elif((targetSelection==4) & (creature3.albums>=0)): #item creature3
+                    itemAction(itemSelection, creature3)
                     creature1.attack(marv)
                     creature2.attack(marv)
                     creature3.attack(marv)
@@ -366,15 +376,17 @@ class CombatStart:
 '''
 dumb testing stuff goes here
 '''
-marvin = Marvin('Marvin', 25, 5, 6)
-minorHealthPotion = Potion("M. Health Pot.", 1, 10, 0)
-majorHealthPotion = Potion("Ma. Health Pot.", 1, 10, 'heals more')
+minorHealthPotion = Potion("Minor Health Potion", 1, 10, 0)
+medHealthPotion = Potion("Medium Health Potion", 1, 20, 'heals more')
+majorHealthPotion = Potion("Major Health Potion", 1, 999, 'heals full')
 minorPoison = Poison("Minor Poison", 1, 10, 0)
-            
-# TODO: Should keep track of the players inventory by adding objects(items) and removing them.
-inventory = []
+
 inventory.append(minorHealthPotion)
-print(inventory)
+inventory.append(medHealthPotion)
+inventory.append(majorHealthPotion)
+inventory.append(minorPoison)
+
+marvin = Marvin('Marvin', 25, 5, 6)
 
 tim = Creature('Tim', 10, 3, 3)
 
