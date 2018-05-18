@@ -6,16 +6,17 @@ Created on May 11, 2018
 An FUll version of Marvin, but with legacy in mind, real planning, a agile approach... everything 2.0
 '''
 from pip._vendor.distlib.compat import raw_input
+import sys
 
 class Creature:
     'Common base class for all creatures'
-    
     def __init__(self, name, albums, jazz, damage):
         self.name = name
         self.albums = albums # health
         self.maxHealth = albums
         self.damage = damage
         self.jazz = jazz # magic
+        self.dead = False
         
     def __repr__(self):
         return " Name: {}\n Albums: {}\n Damage: {}".format(self.name, self.albums, self.damage)
@@ -29,17 +30,16 @@ class Creature:
         else:
             print('{} attacks {} for {}.'.format(self.name, creature.name, self.damage))
             creature.albums-=self.damage
+            if(creature.albums<=0):
+                creature.albums=0
+                creature.death()
+                
+    def death(self):
+        print("{} dies.".format(self.name))
+        self.dead = True
         
 class Marvin(Creature):
     'the man himself'
-    
-    def attack(self, creature):
-        if(self.albums<=0):
-            pass
-        else:
-            print('{} attacks {} for {}.'.format(self.name, creature.name, self.damage))
-            creature.albums-=self.damage
-        
     def heal(self):
         self.albums+=self.jazz
         if (self.maxHealth<self.albums):
@@ -47,6 +47,12 @@ class Marvin(Creature):
             self.albums = self.maxHealth
         else:
             print('You heal for {}.'.format(self.jazz))
+            
+    def death(self):
+        print("{} dies.".format(self.name))
+        self.dead = True
+        print("\n !!!!!!! Game Over !!!!!!!")
+        sys.exit(0)
             
 class Item:
     'Base class for all items'
@@ -88,7 +94,7 @@ class Poison(Item):
         targetCreature.albums-=self.health
         
 # Read user input for the whole game.
-# TODO: Possible efficiency issues. Try removing. 
+# FIXME: Possible efficiency issues. Try removing. Also why only 1-5 for controls???
 def selectAction():
     playerChoice = raw_input(': ')
     while True: 
@@ -108,7 +114,7 @@ def selectAction():
 
 # checks if user input is valid for the combat menu. 
 def combatMenu():
-    print("\nEnter 1 for attack, 2 for magic, 3 for items:")
+    print("\nEnter 1 for attack, 2 for magic, 3 for items, 4 to inspect:")
     validChoice = False
     option = selectAction()
     while(validChoice == False):
@@ -121,11 +127,15 @@ def combatMenu():
         elif(option==3):
             validChoice = True
             return 3
+        elif(option==4):
+            validChoice = True
+            return 4
         else:
-            print("Enter 1 for attack, 2 for magic, 3 for items:")
+            print("Enter 1 for attack, 2 for magic, 3 for items, 4 to inspect:")
             option = selectAction()
             
 # Player's inventory
+# TODO: make a global variable section for this. 
 inventory = []
 
 # Selects the item from inventory
@@ -136,7 +146,11 @@ def itemMenu():
     else:
         print(inventory)
     item = selectAction()
-    return inventory[item-1]
+    if(item>len(inventory)):
+        print("Select the item with 1-5.")
+        return 0
+    else:
+        return inventory[item-1]
 
 # uses item on creature
 def itemAction(itemSelection, targetCreature):
@@ -192,7 +206,7 @@ def threeTarget():
             validChoice = True
             return 5
         else:
-            print("Enter 1-2 to select target, 5 to to return.")
+            print("Enter 1-3 to select target, 5 to to return.")
             target = selectAction()
             
 def fourTarget():
@@ -215,7 +229,7 @@ def fourTarget():
             validChoice = True
             return 5
         else:
-            print("Enter 1-2 to select target, 5 to to return.")
+            print("Enter 1-4 to select target, 5 to to return.")
             target = selectAction()
 
 class CombatStart:
@@ -247,7 +261,6 @@ class CombatStart:
             elif(menuSelection==3): #item
                 itemSelection = itemMenu()
                 if(itemSelection==0):
-                    print("No items.")
                     pass
                 else:
                     print("Select target to use [{}] on:\n'1' for {}, '2' for {}".format(itemSelection.name, marv.name, creature1.name))
@@ -261,7 +274,14 @@ class CombatStart:
                     elif(targetSelection==5): #return to combat menu
                         pass
                     
-                
+            elif(menuSelection==4): #inspect
+                print("Select target to inspect:\n'1' for {} and '2' for {}".format(marv.name, creature1.name))
+                targetSelection = twoTarget()
+                if(targetSelection==1):
+                    print(marvin)
+                elif(targetSelection==2):
+                    print(creature1)
+                    
     #handles two on one combat encounters.          
     @classmethod  
     def oneOnTwo(cls, marv, creature1, creature2):
@@ -270,13 +290,13 @@ class CombatStart:
             menuSelection = combatMenu()
             
             if(menuSelection==1): #attack
-                print("Select target to attack:\n'1' for {}, 2 for {}".format(creature1.name, creature2.name))
+                print("Select target to attack:\n'1' for {}, '2' for {}".format(creature1.name, creature2.name))
                 targetSelection = twoTarget()
-                if((targetSelection==1) & (creature1.albums>=0)): #attack creature1
+                if((targetSelection==1) & (creature1.dead==False)): #attack creature1
                     marv.attack(creature1)
                     creature1.attack(marv)
                     creature2.attack(marv)
-                elif((targetSelection==2) & (creature2.albums>=0)): #attack creature2
+                elif((targetSelection==2) & (creature2.dead==False)): #attack creature2
                     marv.attack(creature2)
                     creature1.attack(marv)
                     creature2.attack(marv)
@@ -298,10 +318,9 @@ class CombatStart:
             elif(menuSelection==3): #item
                 itemSelection = itemMenu()
                 if(itemSelection==0):
-                    print("No items.")
                     pass
                 else:
-                    print("Select target to use item on:\n'1' for {}, '2' for {}, 3 for {}".format(marv.name, creature1.name, creature2.name))
+                    print("Select target to use [{}] on:\n'1' for {}, '2' for {}, '3' for {}".format(itemSelection.name, marv.name, creature1.name, creature2.name))
                     targetSelection = threeTarget()
                     if(targetSelection==1): #item marv
                         itemAction(itemSelection, marv)
@@ -319,6 +338,16 @@ class CombatStart:
                         pass
                     else:
                         print("target already down")
+                        
+            elif(menuSelection==4): #inspect
+                print("Select target to inspect:\n'1' for {} and '2' for {}, '3' for {}".format(marv.name, creature1.name, creature2.name))
+                targetSelection = threeTarget()
+                if(targetSelection==1):
+                    print(marvin)
+                elif(targetSelection==2):
+                    print(creature1)
+                elif(targetSelection==3):
+                    print(creature2)
                 
     #handles three on one combat encounters.          
     @classmethod  
@@ -328,8 +357,8 @@ class CombatStart:
             menuSelection = combatMenu()
             
             if(menuSelection==1): #attack
-                print("Select target to attack:\n'1' for {}, 2 for {}, 3 for {}".format(creature1.name, creature2.name, creature3.name))
-                targetSelection = twoTarget()
+                print("Select target to attack:\n'1' for {}, '2' for {}, '3' for {}".format(creature1.name, creature2.name, creature3.name))
+                targetSelection = threeTarget()
                 if((targetSelection==1) & (creature1.albums>=0)): #attack creature1
                     marv.attack(creature1)
                     creature1.attack(marv)
@@ -364,10 +393,9 @@ class CombatStart:
             elif(menuSelection==3): #item
                 itemSelection = itemMenu()
                 if(itemSelection==0):
-                    print("No items.")
                     pass
                 else:
-                    print("Select target to use item on:\n'1' for {}, '2' for {}, 3 for {}".format(marv.name, creature1.name, creature2.name))
+                    print("Select target to use [{}] on:\n'1' for {}, '2' for {}, '3' for {}, '4' for {}".format(itemSelection.name, marv.name, creature1.name, creature2.name, creature3.name))
                     targetSelection = threeTarget()
                     if(targetSelection==1): #item marv
                         itemAction(itemSelection, marv)
@@ -393,21 +421,50 @@ class CombatStart:
                         pass
                     else:
                         print("target already down")
-
+                        
+            elif(menuSelection==4): #inspect
+                print("Select target to inspect:\n'1' for {} and '2' for {}, '3' for {}, '4' for {}".format(marv.name, creature1.name, creature2.name, creature3.name))
+                targetSelection = threeTarget()
+                if(targetSelection==1):
+                    print(marvin)
+                elif(targetSelection==2):
+                    print(creature1)
+                elif(targetSelection==3):
+                    print(creature2)
+                elif(targetSelection==4):
+                    print(creature3)
 '''
-dumb testing stuff goes here
+Here is how to make the game:
 
-inventory.append(minorHealthPotion)
-inventory.append(medHealthPotion)
-inventory.append(majorHealthPotion)
-inventory.append(minorPoison)
+*******************
+*    ITEMS        *
+*******************
+Items are spawned with: 
+<item_name> =  Potion('<string_name>', int_value, 'int_healing/damage', 'string_flavor_text'(can be set to 0 for none.))
+Add items to player's inventory with: 
+inventroy.addpend(<item_name>)
+
+*******************
+*    CREATURES    *
+*******************
+Foes are spawned with:
+<creature_name> = Creature('string_name', int_health, int_jazz, int_damage)
+
+*******************
+*    BATTLES      *
+*******************
+Enemys can be fought by creating an encounter with:
+<encounter_name> = CombatStart.oneOnOne(marvin, <creature_name>)
+<encounter_name> = CombatStart.oneOnTwo(marvin, <creature_name>, <creature_name>)
+<encounter_name> = CombatStart.oneOnThree(marvin, <creature_name>, <creature_name>, <creature_name>)
 '''
 minorHealthPotion = Potion("Minor Health Potion", 1, 10, 0)
 medHealthPotion = Potion("Medium Health Potion", 1, 20, 'heals more')
 majorHealthPotion = Potion("Major Health Potion", 1, 999, 'heals full')
 minorPoison = Poison("Minor Poison", 1, 10, 0)
+deadlyPoison = Poison("Deadly Poison", 1, 20, 'Deals 20 damage')
 
-marvin = Marvin('Marvin', 25, 5, 6)
+marvin = Marvin('Marvin', 25, 5, 6) # The man himself.
 
 tim = Creature('Tim', 10, 3, 3)
 
@@ -418,14 +475,17 @@ mooka = Creature('Guard A', 5, 1, 3)
 mookb = Creature('Guard B', 5, 1, 3)
 boss = Creature('Big Boss', 20, 10, 6)
 
+print("What's Going On? I'm Mark let's fight.")
 introBattle = CombatStart.oneOnOne(marvin, mark)
-print("you won! and found 2 minor healing potions.")
+print("You won! and found 2 minor healing potions.")
 inventory.append(minorHealthPotion)
 inventory.append(minorHealthPotion)
-# TODO: Add a victory thing here when combat exits. 
 
+print("Hey. I'm Tim, and this is Jeff. Let's Get It On.")
 rematch  = CombatStart.oneOnTwo(marvin, tim, jeff)
-# TODO: Add a victory thing here when combat exits. 
+print("You won! and found 2 minor healing potions.")
+inventory.append(deadlyPoison)
 
-finalBoss  = CombatStart.oneOnTwo(mooka, mookb, boss)
-# TODO: Add a victory thing here when combat exits. 
+print("When I'm Alone I Cry. So I made two friends.")
+finalBoss  = CombatStart.oneOnThree(marvin, mooka, mookb, boss)
+print("You won! Play again?")
